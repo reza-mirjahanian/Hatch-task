@@ -18,11 +18,11 @@ module.exports = class Post {
 
 
   /**
-   * Only filter one tag at a time
+   * Only one tag at a time
    * @param {string} tag
    * @return {Promise<Array>}
    */
-  async fetchPost(tag = '') {
+  async fetchDataService(tag = '') {
     try {
       if (!_.isString(tag) || _.size(tag) < 1) {
         throw new Error('Invalid tag')
@@ -39,31 +39,67 @@ module.exports = class Post {
       return posts;
     } catch (e) {
       logger.error(e.message, tag);
-      throw Error('Post:fetchPost()')
+      throw Error('Post:fetchDataService()')
     }
   }
 
   /**
-   * Find, aggregate and sort posts and return
+   * Fetch posts of each tag in concurrent mode
    * @param {Array} tags list of tags, example  ["tech", "health"]
-   * @param option Configs like sort
-   * @param {('id'|'reads'|'likes'|'popularity')} option.sortBy The field to sort the posts by
-   * @param {('asc'|'desc')} option.direction The direction for sorting
    * @return {Promise<Array>}
    */
-  async getPosts(tags = [], {
-    sortBy = 'id',
-    direction = 'asc'
-  }) {
-    if(!_.isArray(tags) || _.size(tags) < 1){
+  async getPosts(tags = []) {
+    if (!_.isArray(tags) || _.size(tags) < 1) {
       throw Error('Tags parameter is required')
     }
-    if(!_.includes( ['id','reads','likes','popularity'],sortBy) || !_.includes( ['asc','asc'],direction) ){
-      throw Error('sortBy parameter is invalid')
+
+    try {
+      //Concurrent requests to the API
+      return await Promise.all(tags.map(tag => this.fetchDataService(tag)));
+    } catch (e) {
+      logger.error(e.message, {
+        tags,
+        sortBy,
+        direction
+      });
+      throw Error('Post:getPosts()')
     }
+
 
   }
 
+  /**
+   * Aggregate, unique and sort posts and return
+   * @param {Array} postsArray list of posts for each tag
+   * @param option Configs like sort
+   * @param {('id'|'reads'|'likes'|'popularity')} option.sortBy The field to sort the posts by
+   * @param {('asc'|'desc')} option.direction The direction for sorting
+   * @return {Array}
+   */
+  mergePost(postsArray = [], {
+    sortBy = 'id',
+    direction = 'asc'
+  }) {
+    if (!_.includes(['id', 'reads', 'likes', 'popularity'], sortBy) || !_.includes(['asc', 'desc'], direction)) {
+      throw Error('sortBy parameter is invalid')
+    }
+
+    //Merge and unique
+    const mergeTable = new Map();
+    for (const posts of postsArray) {
+      for (const item of posts) {
+        const {
+          id
+        } = item;
+        if (!mergeTable.has(id)) {
+          mergeTable.set(id, item)
+        }
+      }
+    }
+    const uniquePosts = [...mergeTable.values()]
+    //Sorting
+    return _.orderBy(uniquePosts, [sortBy], [direction]);
+  }
 
 
 

@@ -10,6 +10,9 @@ const mockPostsHistory = require('../mockData/blog-api/posts_history.json'); //h
 const mockPostsScience = require('../mockData/blog-api/posts_science.json'); //https://api.hatchways.io/assessment/blog/posts?tag=science
 const mockPostsDesign = require('../mockData/blog-api/posts_design.json'); //https://api.hatchways.io/assessment/blog/posts?tag=deisign
 
+/// Final and correct answers
+const mockHistoryTechLikesDesc = require('../mockData/correct_answer/solution_history_tech_likes_desc.json');  //https://api.hatchways.io/assessment/solution/posts?tags=history,tech&sortBy=likes&direction=desc
+
 
 suite('Testing Post Repository', () => {
   suite('async fetchDataService(tag)', () => {
@@ -56,7 +59,7 @@ suite('Testing Post Repository', () => {
       }
     });
 
-    test.only('should return post for the "tech,history" tags correctly', async () => {
+    test('should return post for the "tech,history" tags correctly', async () => {
       const postRepo = new PostRepo();
       const techTag = 'tech';
       const historyTag = 'history';
@@ -120,13 +123,30 @@ suite('Testing Post Repository', () => {
         expect(e.message).to.be.equal('sortBy parameter is invalid')
       }
 
-      // const result = await postRepo.getPosts(tags, {
-      //     sortBy: 'likes',
-      //     direction: 'desc'
-      // });
 
     });
 
+    test('should merge two post array correctly (tags=history,tech&sortBy=likes&direction=desc)', async () => {
+      const postRepo = new PostRepo();
+
+      const resultDesc = await postRepo.mergePost([
+        mockPostsTech.posts,
+        mockPostsHistory.posts
+      ], {
+        sortBy: 'likes',
+        direction: 'desc'
+      });
+
+      const resultAsc = await postRepo.mergePost([
+        mockPostsTech.posts,
+        mockPostsHistory.posts
+      ], {
+        sortBy: 'likes',
+      });
+
+      expect(resultDesc).to.be.deep.equal(mockHistoryTechLikesDesc.posts);
+      expect(resultAsc).to.be.deep.equal(mockHistoryTechLikesDesc.posts.reverse());
+    });
 
   });
 
