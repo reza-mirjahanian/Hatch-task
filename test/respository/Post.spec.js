@@ -5,10 +5,10 @@ const PostRepo = require('../../server/repository/Post');
 const _ = require('lodash');
 const nock = require('nock');
 
-const mockPostsTech = require('../mockData/posts_tech.json'); //https://api.hatchways.io/assessment/blog/posts?tag=tech
-const mockPostsHistory = require('../mockData/posts_history.json'); //https://api.hatchways.io/assessment/blog/posts?tag=history
-const mockPostsScience = require('../mockData/posts_science.json'); //https://api.hatchways.io/assessment/blog/posts?tag=science
-const mockPostsDesign = require('../mockData/posts_design.json'); //https://api.hatchways.io/assessment/blog/posts?tag=deisign
+const mockPostsTech = require('../mockData/blog-api/posts_tech.json'); //https://api.hatchways.io/assessment/blog/posts?tag=tech
+const mockPostsHistory = require('../mockData/blog-api/posts_history.json'); //https://api.hatchways.io/assessment/blog/posts?tag=history
+const mockPostsScience = require('../mockData/blog-api/posts_science.json'); //https://api.hatchways.io/assessment/blog/posts?tag=science
+const mockPostsDesign = require('../mockData/blog-api/posts_design.json'); //https://api.hatchways.io/assessment/blog/posts?tag=deisign
 
 
 suite('Testing Post Repository', () => {
@@ -86,6 +86,23 @@ suite('Testing Post Repository', () => {
             }
 
         });
+    });
+
+    test.only('should return post for the "tech,history" tags correctly', async () => {
+        const postRepo = new PostRepo();
+        const techTag = 'tech';
+        const historyTag = 'history';
+        const tags = [techTag,historyTag];
+        nock(postRepo.HOST)
+            .get(postRepo.PATH)
+            .query(new URLSearchParams(`tag=${techTag}`))
+            .reply(200, mockPostsTech); // Not found!.
+        const result = await postRepo.getPosts(tags,{});
+        // expect(result).to.be.an('array').that.have.lengthOf(28);
+        // expect(_.keys(result[0])).to.be.deep.equal(['author', 'authorId', 'id', 'likes', 'popularity', 'reads', 'tags'])
+        // expect(result[0].tags).to.be.deep.equal(['tech', 'health'])
+
+        nock.cleanAll();
     });
 
 
