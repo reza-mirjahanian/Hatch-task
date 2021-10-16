@@ -13,7 +13,6 @@ suite('Testing Post Repository', () => {
     test('should return post for the "tech" tag correctly', async () => {
       const postRepo = new PostRepo();
       const tag = 'tech';
-      console.log(mockPostsTech)
       nock(postRepo.HOST)
         .get(postRepo.PATH)
         .query(new URLSearchParams(`tag=${tag}`))

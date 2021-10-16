@@ -22,7 +22,8 @@
     "express": "4.16.4",
     "@hapi/joi": "17.1.1",
     "joi": "17.4.0",
-    "axios": "0.21.1"
+    "axios": "0.21.1",
+    "nock": "13.1.3"
   },
   "devDependencies": {
     "chai": "4.3.4",
