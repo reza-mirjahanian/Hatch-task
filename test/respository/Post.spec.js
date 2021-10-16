@@ -56,7 +56,7 @@ suite('Testing Post Repository', () => {
       }
     });
 
-    test('should return post for the "tech,history" tags correctly', async () => {
+    test.only('should return post for the "tech,history" tags correctly', async () => {
       const postRepo = new PostRepo();
       const techTag = 'tech';
       const historyTag = 'history';
@@ -71,14 +71,22 @@ suite('Testing Post Repository', () => {
         .query(new URLSearchParams(`tag=${historyTag}`))
         .reply(200, mockPostsHistory);
       const result = await postRepo.getPosts(tags);
-      // expect(result).to.be.an('array').that.have.lengthOf(28);
-      // expect(_.keys(result[0])).to.be.deep.equal(['author', 'authorId', 'id', 'likes', 'popularity', 'reads', 'tags'])
-      // expect(result[0].tags).to.be.deep.equal(['tech', 'health'])
+      expect(result).to.be.an('array').that.have.lengthOf(2);
+      expect(_.keys(result[0][0])).to.be.deep.equal(['author', 'authorId', 'id', 'likes', 'popularity', 'reads', 'tags'])
+      expect(_.keys(result[1][0])).to.be.deep.equal(['author', 'authorId', 'id', 'likes', 'popularity', 'reads', 'tags'])
+      if (result[0].length === 26) {
+        expect(result[1][0].tags).to.be.deep.equal(['tech', 'health'])
+        expect(result[0][0].tags).to.be.deep.equal(['startups', 'tech', 'history'])
+      } else if (result[0].length === 28) {
+        expect(result[0][0].tags).to.be.deep.equal(['tech', 'health'])
+        expect(result[1][0].tags).to.be.deep.equal(['startups', 'tech', 'history'])
+      }
 
       nock.cleanAll();
     });
-  });
 
+    //@todo test for errors
+  });
 
 
   suite('mergePost()', () => {
@@ -112,10 +120,10 @@ suite('Testing Post Repository', () => {
         expect(e.message).to.be.equal('sortBy parameter is invalid')
       }
 
-        // const result = await postRepo.getPosts(tags, {
-        //     sortBy: 'likes',
-        //     direction: 'desc'
-        // });
+      // const result = await postRepo.getPosts(tags, {
+      //     sortBy: 'likes',
+      //     direction: 'desc'
+      // });
 
     });
 
