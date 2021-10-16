@@ -24,6 +24,7 @@ suite('Testing Post Repository', () => {
 
       nock.cleanAll();
     });
+
     test('should return Error for the wrong tag', async () => {
       const postRepo = new PostRepo();
       try {
@@ -32,6 +33,55 @@ suite('Testing Post Repository', () => {
       } catch (e) {
         expect(e.message).to.be.equal('Post:fetchPost()')
       }
+    });
+  });
+
+  suite('async getPosts()', () => {
+    test('should return Error for the wrong tag parameter', async () => {
+      const postRepo = new PostRepo();
+      try {
+        await postRepo.getPosts('', {})
+        expect(1).to.be.equal(2);
+      } catch (e) {
+        expect(e.message).to.be.equal('Tags parameter is required')
+      }
+      try {
+        await postRepo.getPosts([], {})
+        expect(1).to.be.equal(2);
+      } catch (e) {
+        expect(e.message).to.be.equal('Tags parameter is required')
+      }
+    });
+
+    test('should return Error for the wrong sort parameters', async () => {
+      const postRepo = new PostRepo();
+      try {
+        await postRepo.getPosts(['tech'], {
+          direction: 'left'
+        })
+        expect(1).to.be.equal(2);
+      } catch (e) {
+        expect(e.message).to.be.equal('sortBy parameter is invalid')
+      }
+
+      try {
+        await postRepo.getPosts(['tech','health'], {
+          sortBy: 'price'
+        })
+        expect(1).to.be.equal(2);
+      } catch (e) {
+        expect(e.message).to.be.equal('sortBy parameter is invalid')
+      }
+
+      try {
+        await postRepo.getPosts(['tech','health'], {
+          sortBy: 35
+        })
+        expect(1).to.be.equal(2);
+      } catch (e) {
+        expect(e.message).to.be.equal('sortBy parameter is invalid')
+      }
+
     });
   });
 
