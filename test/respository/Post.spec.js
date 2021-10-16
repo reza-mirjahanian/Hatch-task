@@ -24,6 +24,15 @@ suite('Testing Post Repository', () => {
 
       nock.cleanAll();
     });
+    test('should return Error for the wrong tag', async () => {
+      const postRepo = new PostRepo();
+      try {
+        await postRepo.fetchPost('')
+        expect(1).to.be.equal(2);
+      } catch (e) {
+        expect(e.message).to.be.equal('Post:fetchPost()')
+      }
+    });
   });
 
 
