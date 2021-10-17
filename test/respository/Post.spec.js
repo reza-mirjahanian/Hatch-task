@@ -11,9 +11,10 @@ const mockPostsScience = require('../mockData/blog-api/posts_science.json'); //h
 const mockPostsDesign = require('../mockData/blog-api/posts_design.json'); //https://api.hatchways.io/assessment/blog/posts?tag=deisign
 
 /// Final and correct answers
-const mockHistoryTechLikesDesc = require('../mockData/correct_answer/solution_history_tech_likes_desc.json'); //https://api.hatchways.io/assessment/solution/posts?tags=history,tech&sortBy=likes&direction=desc
 const mockTechIdDesc = require('../mockData/correct_answer/solution_tech_id_desc.json'); // https://api.hatchways.io/assessment/solution/posts?tags=tech&sortBy=id&direction=desc
+const mockHistoryTechLikesDesc = require('../mockData/correct_answer/solution_history_tech_likes_desc.json'); //https://api.hatchways.io/assessment/solution/posts?tags=history,tech&sortBy=likes&direction=desc
 const mockHistoryTechDesignReadsDesc = require('../mockData/correct_answer/solution_history_tech_design_reads_desc.json'); // https://api.hatchways.io/assessment/solution/posts?tags=history,tech,design&sortBy=reads&direction=desc
+const mockHistoryTechDesignSciencePopularityDesc = require('../mockData/correct_answer/solution_history_tech_design_science_popularity_desc.json'); // https://api.hatchways.io/assessment/solution/posts?tags=history,tech,design,science&sortBy=popularity&direction=desc
 
 
 suite('Testing Post Repository', () => {
@@ -128,6 +129,27 @@ suite('Testing Post Repository', () => {
 
     });
 
+    test('should merge one post array correctly (tags=history,tech&sortBy=likes&direction=desc)', async () => {
+      const postRepo = new PostRepo();
+
+      const resultDesc = await postRepo.mergePost([
+        mockPostsTech.posts
+      ], {
+        sortBy: 'id',
+        direction: 'desc'
+      });
+
+      const resultAsc = await postRepo.mergePost([
+        mockPostsTech.posts
+      ], {
+        sortBy: 'id',
+        direction: 'asc'
+      });
+
+      expect(resultDesc).to.be.deep.equal(mockTechIdDesc.posts);
+      expect(resultAsc).to.be.deep.equal(mockTechIdDesc.posts.reverse());
+    });
+
     test('should merge two post array correctly (tags=history,tech&sortBy=likes&direction=desc)', async () => {
       const postRepo = new PostRepo();
 
@@ -150,26 +172,6 @@ suite('Testing Post Repository', () => {
       expect(resultAsc).to.be.deep.equal(mockHistoryTechLikesDesc.posts.reverse());
     });
 
-    test('should merge two post array correctly (tags=history,tech&sortBy=likes&direction=desc)', async () => {
-      const postRepo = new PostRepo();
-
-      const resultDesc = await postRepo.mergePost([
-        mockPostsTech.posts
-      ], {
-        sortBy: 'id',
-        direction: 'desc'
-      });
-
-      const resultAsc = await postRepo.mergePost([
-        mockPostsTech.posts
-      ], {
-        sortBy: 'id',
-        direction: 'asc'
-      });
-
-      expect(resultDesc).to.be.deep.equal(mockTechIdDesc.posts);
-      expect(resultAsc).to.be.deep.equal(mockTechIdDesc.posts.reverse());
-    });
 
     test('should merge three post array correctly (tags=history,tech,design&sortBy=reads&direction=desc)', async () => {
       const postRepo = new PostRepo();
@@ -193,6 +195,33 @@ suite('Testing Post Repository', () => {
 
       expect(resultDesc).to.be.deep.equal(mockHistoryTechDesignReadsDesc.posts);
       expect(resultAsc).to.be.deep.equal(mockHistoryTechDesignReadsDesc.posts.reverse());
+
+    });
+
+    test('should merge four post array correctly (tags=history,tech,design,science&sortBy=popularity&direction=desc)', async () => {
+      const postRepo = new PostRepo();
+
+      const resultDesc = await postRepo.mergePost([
+        mockPostsTech.posts,
+        mockPostsHistory.posts,
+        mockPostsDesign.posts,
+        mockPostsScience.posts
+      ], {
+        sortBy: 'popularity',
+        direction: 'desc'
+      });
+      expect(resultDesc[0]).to.be.deep.equal(mockHistoryTechDesignSciencePopularityDesc.posts[0]);
+      expect(resultDesc.length).to.be.deep.equal(mockHistoryTechDesignSciencePopularityDesc.posts.length);
+      const resultAsc = await postRepo.mergePost([
+        mockPostsTech.posts,
+        mockPostsHistory.posts,
+        mockPostsDesign.posts,
+        mockPostsScience.posts
+      ], {
+        sortBy: 'popularity',
+      });
+      expect(resultAsc[10]).to.be.deep.equal(mockHistoryTechDesignSciencePopularityDesc.posts.reverse()[10]);
+      expect(resultAsc.length).to.be.deep.equal(mockHistoryTechDesignSciencePopularityDesc.posts.length);
 
     });
 
