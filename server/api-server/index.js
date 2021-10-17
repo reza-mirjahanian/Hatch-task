@@ -2,7 +2,8 @@
 const express = require('express'),
   constants = require('../constants'),
   PostRepo = require('../repository/Post'),
-    validateParams = require('./middlewares/validator'),
+  blogAPI = require('../services/blog-api'),
+    validateParams = require('./middlewares/post-serch.validator'),
   cors = require('cors'),
   logger = require('../utils/logger');
 
@@ -25,7 +26,7 @@ app.get('/api/posts', validateParams, async (req, res) => {
       direction = 'asc'
     } = req.query;
 
-    const postRepo = new PostRepo();
+    const postRepo = new PostRepo(blogAPI.run);
     const allPosts = await postRepo.getPosts(tags.split(','));
     const output = postRepo.mergePost(allPosts, {
       sortBy,

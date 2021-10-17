@@ -1,47 +1,20 @@
 'use strict';
-
 const logger = require('../utils/logger'),
-  axios = require('axios'),
   _ = require('lodash');
-
 
 
 module.exports = class Post {
 
-  HOST = 'https://api.hatchways.io';
-  PATH = '/assessment/blog/posts';
-  API_URL = '';
-
-  constructor() {
-    this.API_URL = `${this.HOST}${this.PATH}`;
-  }
-
+  fetchDataService = null
 
   /**
-   * Only one tag at a time
-   * @param {string} tag
-   * @return {Promise<Array>}
+   * @constructor
+   * @param {function} fetchDataService - A service that fetch raw data
    */
-  async fetchDataService(tag = '') {
-    try {
-      if (!_.isString(tag) || _.size(tag) < 1) {
-        throw new Error('Invalid tag')
-      }
-      const {
-        data: {
-          posts
-        }
-      } = await axios.get(this.API_URL, {
-        params: {
-          tag
-        }
-      });
-      return posts;
-    } catch (e) {
-      logger.error(e.message, tag);
-      throw Error('Post:fetchDataService()')
-    }
+  constructor(fetchDataService) {
+    this.fetchDataService = fetchDataService;
   }
+
 
   /**
    * Fetch posts of each tag in concurrent mode
@@ -60,6 +33,7 @@ module.exports = class Post {
     }
   }
 
+
   /**
    * Aggregate, unique and sort posts and return
    * @param {Array} postsArray list of posts for each tag
@@ -72,7 +46,6 @@ module.exports = class Post {
     sortBy = 'id',
     direction = 'asc'
   }) {
-
 
     //Merge and unique
     const mergeTable = new Map();
