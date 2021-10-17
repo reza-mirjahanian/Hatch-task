@@ -23,13 +23,13 @@ app.get('/api/posts', async (req, res) => {
   try {
     const {tags,sortBy = 'id',direction = 'asc'} = req.query;
     const postRepo = new PostRepo();
-    const tagsArray = _.compact(tags.split(','));
+    const tagsArray = (tags && _.isString(tags)) ?_.compact(tags.split(',')) : '';
     const allPosts = await postRepo.getPosts(tagsArray);
     const output = postRepo.mergePost(allPosts,{sortBy,direction})
     return res.status(200).send(output);
   } catch (err) {
     logger.error(req.path, {
-      err
+      err: err.message
     });
     res.status(400).send({
       error: err.message
