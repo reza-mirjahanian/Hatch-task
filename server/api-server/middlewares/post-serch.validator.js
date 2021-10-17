@@ -15,9 +15,7 @@ module.exports = (req, res, next) => {
             error: 'sortBy parameter is invalid'
         })
     }
-
     else {
-
         next()
     }
 }

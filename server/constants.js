@@ -7,8 +7,6 @@ const
 const constants = {
   EXPRESS_PORT: Number(process.env.PORT) || 3200,
   isTestMode
-
-
 };
 
 module.exports = constants;

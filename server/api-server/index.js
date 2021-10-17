@@ -26,6 +26,7 @@ app.get('/api/posts', validateParams, async (req, res) => {
       direction = 'asc'
     } = req.query;
 
+    //@todo maybe refactor to a controller
     const postRepo = new PostRepo(blogAPI.run);
     const allPosts = await postRepo.getPosts(tags.split(','));
     const output = postRepo.mergePost(allPosts, {
@@ -33,6 +34,7 @@ app.get('/api/posts', validateParams, async (req, res) => {
       direction
     })
     return res.status(200).send(output);
+
   } catch (err) {
     logger.error(req.path, {
       err: err.message
@@ -40,7 +42,6 @@ app.get('/api/posts', validateParams, async (req, res) => {
     res.status(500).send({
       error: "Server Error"
     });
-
   }
 });
 

@@ -29,6 +29,7 @@ module.exports = {
         }
       });
       return posts;
+
     } catch (e) {
       logger.error(e.message, tag);
       throw Error('Service:bog-api()')

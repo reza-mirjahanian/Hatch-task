@@ -1,15 +1,16 @@
 'use strict';
 const expect = require('chai').expect;
-require('../../server/api-server'); //@todo maybe cleanup
+require('../../server/api-server');
+const nock = require('nock');
 
 const constants = require('../../server/constants');
-const PostRepo = require('../../server/repository/Post');
+const blogAPI = require('../../server/services/blog-api');
 const axios = require('axios');
-const _ = require('lodash');
-const sinon = require("sinon");
 const SERVER_URL = `http://localhost:${constants.EXPRESS_PORT}`;
 
 const mockHistoryTechLikesDesc = require('../mockData/correct_answer/solution_history_tech_likes_desc.json'); //https://api.hatchways.io/assessment/solution/posts?tags=history,tech&sortBy=likes&direction=desc
+const mockPostsTech = require('../mockData/blog-api/posts_tech.json'); //https://api.hatchways.io/assessment/blog/posts?tag=tech
+const mockPostsHistory = require('../mockData/blog-api/posts_history.json'); //https://api.hatchways.io/assessment/blog/posts?tag=history
 
 suite('Testing Express API routes', () => {
 
@@ -49,7 +50,6 @@ suite('Testing Express API routes', () => {
     });
 
     test('should return error, If `direction==up` is invalid value', async () => {
-      //@todo fix stub
       const {
         data: response,
         status
@@ -63,7 +63,6 @@ suite('Testing Express API routes', () => {
     });
 
     test('should return error, If `sortBy==price` is invalid value', async () => {
-      //@todo fix stub
       const {
         data: response,
         status
@@ -77,7 +76,6 @@ suite('Testing Express API routes', () => {
     });
 
     test('should return error, If `sortBy==35` is invalid value', async () => {
-      //@todo fix stub
       const {
         data: response,
         status
@@ -91,14 +89,24 @@ suite('Testing Express API routes', () => {
     });
 
     test('should return posts correctly', async () => {
-      const postRepo = new PostRepo();
-      //@todo fix stub
+      nock(blogAPI.HOST)
+        .get(blogAPI.PATH)
+        .query(new URLSearchParams(`tag=tech`))
+        .reply(200, mockPostsTech);
+
+      nock(blogAPI.HOST)
+        .get(blogAPI.PATH)
+        .query(new URLSearchParams(`tag=history`))
+        .reply(200, mockPostsHistory);
+
       const {
         data: response,
         status
       } = await axios.get(`${SERVER_URL}/api/posts?tags=history,tech&sortBy=likes&direction=desc`);
       expect(status).to.equal(200)
-      expect(response).to.deep.equal(mockHistoryTechLikesDesc.posts)
+      expect(response).to.deep.equal(mockHistoryTechLikesDesc.posts);
+
+      nock.cleanAll();
     });
   });
 
