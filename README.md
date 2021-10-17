@@ -31,3 +31,5 @@ Reza Mirjahanian
 - 💡 Improve Testing
 
 - 💡 https://swagger.io
+
+- 💡 Dictionary for Errors

@@ -49,10 +49,6 @@ module.exports = class Post {
    * @return {Promise<Array>}
    */
   async getPosts(tags = []) {
-    if (!_.isArray(tags) || _.size(tags) < 1) {
-      throw Error('Tags parameter is required')
-    }
-
     try {
       //Concurrent requests to the API
       return await Promise.all(tags.map(tag => this.fetchDataService(tag)));
@@ -76,9 +72,7 @@ module.exports = class Post {
     sortBy = 'id',
     direction = 'asc'
   }) {
-    if (!_.includes(['id', 'reads', 'likes', 'popularity'], sortBy) || !_.includes(['asc', 'desc'], direction)) {
-      throw Error('sortBy parameter is invalid')
-    }
+
 
     //Merge and unique
     const mergeTable = new Map();
@@ -96,8 +90,6 @@ module.exports = class Post {
     //Sorting
     return _.orderBy(uniquePosts, [sortBy], [direction]);
   }
-
-
 
 
 }
