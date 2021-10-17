@@ -58,14 +58,10 @@ module.exports = class Post {
       return await Promise.all(tags.map(tag => this.fetchDataService(tag)));
     } catch (e) {
       logger.error(e.message, {
-        tags,
-        sortBy,
-        direction
+        tags
       });
       throw Error('Post:getPosts()')
     }
-
-
   }
 
   /**
