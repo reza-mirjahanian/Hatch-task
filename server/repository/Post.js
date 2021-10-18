@@ -9,7 +9,7 @@ module.exports = class Post {
 
   /**
    * @constructor
-   * @param {function} fetchDataService - A service that fetch raw data
+   * @param {Promise<function>} fetchDataService - A service that fetch raw data
    */
   constructor(fetchDataService) {
     this.fetchDataService = fetchDataService;

@@ -3,7 +3,8 @@ const express = require('express'),
   constants = require('../constants'),
   PostRepo = require('../repository/Post'),
   blogAPI = require('../services/blog-api'),
-    validateParams = require('./middlewares/post-serch.validator'),
+  CacheService = require('../services/cache'),
+  validateParams = require('./middlewares/post-serch.validator'),
   cors = require('cors'),
   logger = require('../utils/logger');
 
@@ -11,6 +12,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+const cache = new CacheService(constants.CACHE_TIME); // Create a new cache service instance
 
 // Route 1:
 app.get('/api/ping', (req, res) => res.send({
@@ -27,7 +30,8 @@ app.get('/api/posts', validateParams, async (req, res) => {
     } = req.query;
 
     //@todo maybe refactor to a controller
-    const postRepo = new PostRepo(blogAPI.run);
+    const fetchDataWithCache = cache.wrap(blogAPI.run);
+    const postRepo = new PostRepo(fetchDataWithCache);
     const allPosts = await postRepo.getPosts(tags.split(','));
     const output = postRepo.mergePost(allPosts, {
       sortBy,
