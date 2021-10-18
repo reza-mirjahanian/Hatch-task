@@ -2,7 +2,7 @@
 const express = require('express'),
   constants = require('../constants'),
   PostRepo = require('../repository/Post'),
-  blogAPI = require('../services/blog-api'),
+  blogService = require('../services/blog-api'),
   CacheService = require('../services/cache'),
   validateParams = require('./middlewares/post-serch.validator'),
   cors = require('cors'),
@@ -30,14 +30,16 @@ app.get('/api/posts', validateParams, async (req, res) => {
     } = req.query;
 
     //@todo maybe refactor to a controller
-    const fetchDataWithCache = cache.wrap(blogAPI.run);
+    const fetchDataWithCache = cache.wrap(blogService.run);
     const postRepo = new PostRepo(fetchDataWithCache);
     const allPosts = await postRepo.getPosts(tags.split(','));
-    const output = postRepo.mergePost(allPosts, {
+    const sortedPosts = postRepo.mergePost(allPosts, {
       sortBy,
       direction
     })
-    return res.status(200).send(output);
+    return res.status(200).send({
+      posts: sortedPosts
+    });
 
   } catch (err) {
     logger.error(req.path, {

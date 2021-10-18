@@ -13,7 +13,6 @@ const mockPostsTech = require('../mockData/blog-api/posts_tech.json'); //https:/
 const mockPostsHistory = require('../mockData/blog-api/posts_history.json'); //https://api.hatchways.io/assessment/blog/posts?tag=history
 
 suite('Testing Express API routes', () => {
-
   suite('GET /api/ping', () => {
     test('should respond ping route correctly', async () => {
       const {
@@ -104,7 +103,7 @@ suite('Testing Express API routes', () => {
         status
       } = await axios.get(`${SERVER_URL}/api/posts?tags=history,tech&sortBy=likes&direction=desc`);
       expect(status).to.equal(200)
-      expect(response).to.deep.equal(mockHistoryTechLikesDesc.posts);
+      expect(response).to.deep.equal(mockHistoryTechLikesDesc);
 
       nock.cleanAll();
     });
